@@ -5,16 +5,20 @@
         <MudItem xs="12" md="6">
             <MudStack>
                 <MudText Typo="Typo.h6">Overworld portal location...</MudText>
-                <MudTextField @bind-Value="OverworldX" Label="X" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
-                <MudTextField @bind-Value="OverworldZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="OverworldX" Label="X" Variant="Variant.Outlined" DebounceInterval="100"
+                              OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="OverworldZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100"
+                              OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
             </MudStack>
         </MudItem>
 
         <MudItem xs="12" md="6">
             <MudStack>
                 <MudText Typo="Typo.h6">Nether portal location...</MudText>
-                <MudTextField @bind-Value="NetherX" Label="X" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
-                <MudTextField @bind-Value="NetherZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="NetherX" Label="X" Variant="Variant.Outlined" DebounceInterval="100"
+                              OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="NetherZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100"
+                              OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
             </MudStack>
         </MudItem>
 
@@ -23,12 +27,17 @@
                 The Y Coordinate is not converted like X and Z. The Eureka portal network is on
                 <MudChip T="string" Color="Color.Info">
                     Y = 110
-                </MudChip>, so in most cases you will want to build your portal in the Nether at this level.
-                
+                </MudChip>
+                , so in most cases you will want to build your portal in the Nether at this level.
+
                 <hr/>
-                
+
                 <p>
-                    Click <MudLink Href="https://minecraft.wiki/w/Nether_portal#Portal_linkage_between_Overworld_and_Nether">here</MudLink> for more information.
+                    Click
+                    <MudLink Href="https://minecraft.wiki/w/Nether_portal#Portal_linkage_between_Overworld_and_Nether">
+                        here
+                    </MudLink>
+                    for more information.
                 </p>
             </MudAlert>
         </MudItem>
