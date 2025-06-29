@@ -23,7 +23,6 @@ public class DataService(EurekaContext eurekaContext) : IDataService
 
     public async Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit = 10)
     {
-        // get the date of the start of this week
         var weekStart = DateOnly.FromDateTime(DateTime.Today).StartOfWeek(DayOfWeek.Monday);
 
         return await GetTopPlayers(limit, weekStart, null);
