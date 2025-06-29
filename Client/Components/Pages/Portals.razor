@@ -1,0 +1,59 @@
+﻿@page "/Portals"
+
+<MudPaper Class="px-16 my-4" Elevation="1">
+    <MudGrid Class="py-8">
+        <MudItem xs="12" md="6">
+            <MudStack>
+                <MudText Typo="Typo.h6">Overworld portal location...</MudText>
+                <MudTextField @bind-Value="OverworldX" Label="X" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="OverworldZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToNether" Format="F0"></MudTextField>
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudStack>
+                <MudText Typo="Typo.h6">Nether portal location...</MudText>
+                <MudTextField @bind-Value="NetherX" Label="X" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
+                <MudTextField @bind-Value="NetherZ" Label="Z" Variant="Variant.Outlined" DebounceInterval="100" OnDebounceIntervalElapsed="ConvertToOverworld" Format="F0"></MudTextField>
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                The Y Coordinate is not converted like X and Z. The Eureka portal network is on
+                <MudChip T="string" Color="Color.Info">
+                    Y = 110
+                </MudChip>, so in most cases you will want to build your portal in the Nether at this level.
+                
+                <hr/>
+                
+                <p>
+                    Click <MudLink Href="https://minecraft.wiki/w/Nether_portal#Portal_linkage_between_Overworld_and_Nether">here</MudLink> for more information.
+                </p>
+            </MudAlert>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    private double OverworldX { get; set; }
+
+    private double OverworldZ { get; set; }
+
+    private double NetherX { get; set; }
+
+    private double NetherZ { get; set; }
+
+    private void ConvertToNether()
+    {
+        NetherX = Math.Floor(OverworldX / 8);
+        NetherZ = Math.Floor(OverworldZ / 8);
+    }
+
+    private void ConvertToOverworld()
+    {
+        OverworldX = Math.Floor(NetherX / 8);
+        OverworldZ = Math.Floor(NetherZ / 8);
+    }
+
+}

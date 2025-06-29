@@ -12,7 +12,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
-builder.Services.AddScoped<FirebaseService>();
 builder.Services.AddScoped<IDataService, DataService>();
 
 builder.Services.AddDbContext<EurekaContext>(
