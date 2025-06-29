@@ -4,12 +4,17 @@ from datetime import datetime
 import yaml
 from mcstatus import JavaServer
 import logging
+import os
 
 # Set up basic logging to record events and errors.
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def load_config(config_path="config.yaml"):
+
+def load_config():
     """Loads the configuration from a YAML file."""
+    env = os.getenv("EUREKA_ENVIRONMENT")
+    config_path = f"config.{env}.yaml" if env else "config.yaml"
+
     try:
         with open(config_path, "r") as f:
             return yaml.safe_load(f)
@@ -89,6 +94,7 @@ def update_database(player_data, db_path):
 
 def main():
     """Main execution function."""
+
     config = load_config()
     if not config:
         logging.error("Exiting due to missing or invalid configuration.")
