@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  PROJECT_ROOT: /home/runner/work/eureka_tracker_blazor/eureka_tracker_blazor
+
 jobs:
   build:
 
@@ -30,5 +33,5 @@ jobs:
       with:
         name: Client
         path: |
-          /home/runner/work/eureka_tracker_blazor/eureka_tracker_blazor/Client/bin/Release/net9.0/publish/
-          /home/runner/work/eureka_tracker_blazor/eureka_tracker_blazor/Pinger/
+          '$PROJECT_ROOT/Client/bin/Release/net9.0/publish/'
+          '$PROJECT_ROOT/Pinger/'
