@@ -33,5 +33,5 @@ jobs:
       with:
         name: Client
         path: |
-          $PROJECT_ROOT/Client/bin/Release/net9.0/publish/
-          $PROJECT_ROOT/Pinger/
+          ${{ env.PROJECT_ROOT }}/Client/bin/Release/net9.0/publish/
+          ${{ env.PROJECT_ROOT }}/Pinger/
