@@ -1,5 +1,4 @@
 using Client.Components;
-using Client.Services;
 using Client.Services.Data_Service;
 using EurekaDb.Context;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -14,9 +13,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 builder.Services.AddScoped<IDataService, DataService>();
 
-builder.Services.AddDbContext<EurekaContext>(
-    e => e.UseSqlite(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<EurekaContext>(e => e.UseSqlite(
+    builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -30,7 +28,7 @@ if (!app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions()
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });

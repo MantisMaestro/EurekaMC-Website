@@ -23,7 +23,6 @@ public class DataService(EurekaContext eurekaContext) : IDataService
 
     public async Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit = 10)
     {
-        // get the date of the start of this week
         var weekStart = DateOnly.FromDateTime(DateTime.Today).StartOfWeek(DayOfWeek.Monday);
 
         return await GetTopPlayers(limit, weekStart, null);
@@ -33,7 +32,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     {
         var monthStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         var monthStartDate = DateOnly.FromDateTime(monthStart);
-        
+
         return await GetTopPlayers(limit, monthStartDate, null);
     }
 
@@ -50,34 +49,32 @@ public class DataService(EurekaContext eurekaContext) : IDataService
             .FirstOrDefaultAsync(x => x.Name == playerName);
 
         if (player is null) return null;
-        
+
         var playerId = player?.Id;
 
         var startDate = DateTime.Today.AddMonths(-1);
         var startDateOnly = DateOnly.FromDateTime(startDate);
-        
+
         var sessions = await eurekaContext.PlayerSessions
             .Where(x => x.PlayerId == playerId && x.Date >= startDateOnly)
             .Include(x => x.Player)
             .ToListAsync();
-        
+
         var totalPlaytime = sessions.Sum(x => x.TimePlayedInSession ?? 0);
 
         var dates = sessions.Select(x => x.Date).ToList();
-        
+
         var today = DateOnly.FromDateTime(DateTime.Today);
         for (var date = startDateOnly; date < today; date = date.AddDays(1))
-        {
             if (!dates.Contains(date))
                 sessions.Add(new PlayerSession
                 {
                     Date = date,
                     TimePlayedInSession = 0
                 });
-        }
-        
+
         sessions = sessions.OrderBy(x => x.Date).ToList();
-        
+
         return new PlayerQuery
         {
             PlayerSessions = sessions,
@@ -88,15 +85,15 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     private async Task<List<PlayerPlaytime>> GetTopPlayers(int limit, DateOnly startDate, DateOnly? endDate)
     {
         endDate ??= DateOnly.FromDateTime(DateTime.Today);
-        
+
         var sessionsThisWeek = await eurekaContext
             .PlayerSessions
             .Where(x => x.Date >= startDate && x.Date <= endDate)
             .Include(x => x.Player)
             .ToListAsync();
-        
+
         var groupedPlayerSessions = sessionsThisWeek.GroupBy(x => x.PlayerId);
-        
+
         var result = new List<PlayerPlaytime>();
         foreach (var groupedPlayerSession in groupedPlayerSessions)
             result.Add(new PlayerPlaytime
@@ -105,7 +102,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
                 PlayerName = groupedPlayerSession.First().Player.Name,
                 Playtime = groupedPlayerSession.Sum(x => x.TimePlayedInSession ?? 0)
             });
-        
+
         result = result.OrderByDescending(x => x.Playtime).ToList();
         return result.Take(limit).ToList();
     }
