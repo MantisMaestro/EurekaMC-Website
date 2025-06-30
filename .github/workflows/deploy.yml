@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c Release
     - name: Publish
-      run: dotnet publish -c Release -o out
+      run: dotnet publish Client/Client.csproj -c Release
