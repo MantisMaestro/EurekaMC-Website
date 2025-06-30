@@ -78,7 +78,7 @@
         <MudItem xs="12">
             <MudStack Row="true">
                 <MudTextField @bind-Value="PlayerName" Label="Player Name" Variant="Variant.Outlined" Clearable="true"/>
-                
+
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="SearchPlayer">
                     Search
                 </MudButton>
@@ -90,7 +90,8 @@
             <MudItem xs="12">
                 <MudText Typo="Typo.h4">Time played in hours:</MudText>
                 <MudPaper>
-                    <MudChart ChartType="ChartType.Bar" ChartSeries="@_series" XAxisLabels="_labels" ChartOptions="new ChartOptions() { YAxisTicks = 2 }">
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@_series" XAxisLabels="_labels"
+                              ChartOptions="new ChartOptions { YAxisTicks = 2 }">
 
                     </MudChart>
                 </MudPaper>
@@ -104,15 +105,15 @@
     private List<Player> _onlinePlayers = [];
 
     private List<PlayerPlaytime> _topPlayers = [];
-    
-    private PlayerQuery? _playerQuery = new PlayerQuery();
+
+    private PlayerQuery? _playerQuery = new();
 
     private List<ChartSeries> _series = [];
 
     private string[] _labels = [];
 
     private string _selectedTime = "This Week";
-    
+
     public string? PlayerName { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -155,7 +156,7 @@
 
     private async Task SearchPlayer(MouseEventArgs obj)
     {
-        if (!string.IsNullOrEmpty(PlayerName)) 
+        if (!string.IsNullOrEmpty(PlayerName))
             _playerQuery = await DataService.GetPlayerSessions(PlayerName);
 
         if (_playerQuery is null)
@@ -163,18 +164,18 @@
             Snackbar.Add("Player Not Found", Severity.Warning);
             return;
         }
-        
+
         var data = _playerQuery.PlayerSessions.Select(x => x.TimePlayedInSession!.Value).ToArray();
         var dataDouble = data.Select(Convert.ToDouble).ToArray();
-        
+
         dataDouble = dataDouble.Select(x => x / 3600).ToArray();
         dataDouble = dataDouble.Select(x => Math.Round(x, 2)).ToArray();
-        
+
         _series =
         [
-            new ChartSeries() { Name = "Playtime", Data = dataDouble }
+            new ChartSeries { Name = "Playtime", Data = dataDouble }
         ];
-        
+
         _labels = _playerQuery.PlayerSessions.Select(x => x.Date.ToString("dd-MMM")).ToArray();
 
         for (var i = 0; i < _labels.Length; i++)
@@ -184,7 +185,7 @@
                 _labels[i] = "";
             }
         }
-        
+
         StateHasChanged();
     }
 
