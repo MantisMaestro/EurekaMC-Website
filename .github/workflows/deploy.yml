@@ -26,3 +26,7 @@ jobs:
       run: dotnet build --no-restore -c Release
     - name: Publish
       run: dotnet publish Client/Client.csproj -c Release
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Client
+        path: '/home/runner/work/eureka_tracker_blazor/eureka_tracker_blazor/Client/bin/Release/net9.0/publish/'
