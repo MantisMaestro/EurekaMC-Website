@@ -13,14 +13,13 @@
 </nav>
 
 @code {
-    [CascadingParameter]
-    private bool IsDarkMode { get; set; }
+    [CascadingParameter] private bool IsDarkMode { get; set; }
 
-    [Parameter]
-    public EventCallback<bool> IsDarkModeChanged { get; set; }
+    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
 
     private async Task ToggleTheme()
     {
         await IsDarkModeChanged.InvokeAsync(!IsDarkMode);
     }
+
 }

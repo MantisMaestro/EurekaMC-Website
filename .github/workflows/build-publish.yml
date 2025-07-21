@@ -12,27 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-    - name: Build
-      run: dotnet build -c Release
-    - name: Test
-      run: dotnet test --verbosity normal
-    - name: Publish
-      if: github.event_name == 'push'
-      run: dotnet publish Client/Client.csproj -c Release
-    - uses: actions/upload-artifact@v4
-      if: github.event_name == 'push'
-      with:
-        name: Client
-        path: |
-          ${{ github.workspace }}/Client/bin/Release/net9.0/publish/
-    - uses: actions/upload-artifact@v4
-      if: github.event_name == 'push'
-      with:
-        name: Pinger
-        path: |
-          ${{ github.workspace }}/Pinger/
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x
+      - name: Build
+        run: dotnet build -c Release
+      - name: Test
+        run: dotnet test --verbosity normal
+      - name: Publish
+        if: github.event_name == 'push'
+        run: dotnet publish Client/Client.csproj -c Release
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: Client
+          path: |
+            ${{ github.workspace }}/Client/bin/Release/net9.0/publish/
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: Pinger
+          path: |
+            ${{ github.workspace }}/Pinger/

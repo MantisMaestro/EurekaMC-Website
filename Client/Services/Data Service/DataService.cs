@@ -19,7 +19,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     public async Task<int> GetTodayPlayerCount()
     {
         var date = DateOnly.FromDateTime(DateTime.Today - TimeSpan.FromDays(7));
-        
+
         return await eurekaContext
             .PlayerSessions
             .Where(x => x.Date >= date)
