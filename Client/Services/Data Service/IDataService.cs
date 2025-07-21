@@ -6,6 +6,8 @@ namespace Client.Services.Data_Service;
 public interface IDataService
 {
     public Task<List<Player>> GetOnlinePlayers();
+    
+    public Task<int> GetTodayPlayerCount();
 
     public Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit);
 

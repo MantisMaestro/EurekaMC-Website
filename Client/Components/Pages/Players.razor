@@ -1,0 +1,192 @@
+﻿@page "/players"
+@using Client.Components.Common
+@using Client.Models
+@using Client.Services.Data_Service
+@using EurekaDb.Migrations
+@rendermode InteractiveServer
+
+@inject ISnackbar Snackbar
+
+@inject IDataService DataService
+
+<PageTitle>Home</PageTitle>
+
+<MudPaper Class="px-16 my-4" Elevation="1">
+    <MudGrid>
+        <MudItem md="12" lg="6">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                <MudGrid Class="d-flex align-center justify-center mud-width-full py-8">
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.h5" Align="Align.Center">
+                            @(_onlinePlayers.Count) Online Now
+                        </MudText>
+                    </MudItem>
+
+                    <MudItem Class="pt-3">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="RefreshOnline">
+                            Refresh
+                        </MudButton>
+                    </MudItem>
+
+                    <MudFlexBreak/>
+
+                    @foreach (var player in _onlinePlayers)
+                    {
+                        <MudItem sm="12" md="6" Class="pt-3">
+                            <PlayerCard PlayerName="@player.Name"/>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem md="12" lg="6">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                <MudGrid Class="d-flex align-center justify-center mud-width-full py-8">
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.h5" Align="Align.Center">
+                            Playing The Most @_selectedTime
+                        </MudText>
+                    </MudItem>
+
+                    <MudItem Class="pt-3">
+                        <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                            <MudButton OnClick="ViewTodayTopPlayers">Day</MudButton>
+                            <MudButton OnClick="ViewWeekTopPlayers">Week</MudButton>
+                            <MudButton OnClick="ViewMonthTopPlayers">Month</MudButton>
+                            <MudButton OnClick="ViewMapTopPlayers">Map 11</MudButton>
+                        </MudButtonGroup>
+                    </MudItem>
+
+                    <MudFlexBreak/>
+
+                    @foreach (var player in _topPlayers)
+                    {
+                        <MudItem xs="12" Class="pt-3">
+                            <PlayerCard PlayerName="@player.PlayerName" PlayTimeSeconds="@player.Playtime.ToString()"/>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+<MudPaper Class="pa-16 my-4" Elevation="1">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudStack Row="true">
+                <MudTextField @bind-Value="PlayerName" Label="Player Name" Variant="Variant.Outlined" Clearable="true"/>
+
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="SearchPlayer">
+                    Search
+                </MudButton>
+            </MudStack>
+        </MudItem>
+
+        @if (_series.Count > 0)
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.h4">Time played in hours:</MudText>
+                <MudPaper>
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@_series" XAxisLabels="_labels"
+                              ChartOptions="new ChartOptions { YAxisTicks = 2 }">
+
+                    </MudChart>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
+
+@code{
+
+    private List<Player> _onlinePlayers = [];
+
+    private List<PlayerPlaytime> _topPlayers = [];
+
+    private PlayerQuery? _playerQuery = new();
+
+    private List<ChartSeries> _series = [];
+
+    private string[] _labels = [];
+
+    private string _selectedTime = "This Week";
+
+    public string? PlayerName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _onlinePlayers = await DataService.GetOnlinePlayers();
+        _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
+
+        _topPlayers = await DataService.GetWeekTopPlayers(10);
+    }
+
+    private async Task ViewTodayTopPlayers()
+    {
+        _topPlayers = await DataService.GetDayTopPlayers(10);
+        _selectedTime = "Today";
+    }
+
+    private async Task ViewWeekTopPlayers()
+    {
+        _topPlayers = await DataService.GetWeekTopPlayers(10);
+        _selectedTime = "This Week";
+    }
+
+    private async Task ViewMonthTopPlayers()
+    {
+        _topPlayers = await DataService.GetMonthTopPlayers(10);
+        _selectedTime = "This Month";
+    }
+
+    private async Task RefreshOnline()
+    {
+        _onlinePlayers = await DataService.GetOnlinePlayers();
+        _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
+    }
+
+    private async Task ViewMapTopPlayers()
+    {
+        _topPlayers = await DataService.GetMapTopPlayers(10);
+        _selectedTime = "On This Map";
+    }
+
+    private async Task SearchPlayer(MouseEventArgs obj)
+    {
+        if (!string.IsNullOrEmpty(PlayerName))
+            _playerQuery = await DataService.GetPlayerSessions(PlayerName);
+
+        if (_playerQuery is null)
+        {
+            Snackbar.Add("Player Not Found", Severity.Warning);
+            return;
+        }
+
+        var data = _playerQuery.PlayerSessions.Select(x => x.TimePlayedInSession!.Value).ToArray();
+        var dataDouble = data.Select(Convert.ToDouble).ToArray();
+
+        dataDouble = dataDouble.Select(x => x / 3600).ToArray();
+        dataDouble = dataDouble.Select(x => Math.Round(x, 2)).ToArray();
+
+        _series =
+        [
+            new ChartSeries { Name = "Playtime", Data = dataDouble }
+        ];
+
+        _labels = _playerQuery.PlayerSessions.Select(x => x.Date.ToString("dd-MMM")).ToArray();
+
+        for (var i = 0; i < _labels.Length; i++)
+        {
+            if (i % 5 != 0)
+            {
+                _labels[i] = "";
+            }
+        }
+
+        StateHasChanged();
+    }
+
+}

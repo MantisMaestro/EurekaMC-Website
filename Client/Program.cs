@@ -33,6 +33,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
+app.MapStaticAssets();
 app.UseStaticFiles();
 app.UseAntiforgery();
 

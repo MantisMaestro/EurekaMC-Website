@@ -1,0 +1,26 @@
+<nav class="horizontal-nav">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/portals">Portals</a></li>
+        <li><a href="/players">Players</a></li>
+        <li><a href="/gallery">Gallery</a></li>
+        <li style="margin-left: auto;">
+            <a href="javascript:void(0)" @onclick="ToggleTheme">
+                <span class="theme-icon">@(IsDarkMode ? "🌙" : "☀️")</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+@code {
+    [CascadingParameter]
+    private bool IsDarkMode { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsDarkModeChanged { get; set; }
+
+    private async Task ToggleTheme()
+    {
+        await IsDarkModeChanged.InvokeAsync(!IsDarkMode);
+    }
+}
