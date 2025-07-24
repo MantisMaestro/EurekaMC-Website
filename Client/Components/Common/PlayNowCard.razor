@@ -2,7 +2,17 @@
           onclick="window.open('ms-xbl-6af6e7cc://', '_blank')">
     <div class="d-flex flex-column align-center">
         <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">Play Now - <b>173.240.152.72:9000</b></MudText>
-        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">@OnlineNow Players Online Recently</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">@OnlineNow
+            @if (OnlineNow == 1)
+            {
+                <span> Player</span>
+            }
+            else
+            {
+                <span> Players</span>
+            }
+            Online Recently
+        </MudText>
     </div>
 </MudPaper>
 
