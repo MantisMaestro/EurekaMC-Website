@@ -1,13 +1,22 @@
 <nav class="horizontal-nav">
     <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/portals">Portals</a></li>
-        <li><a href="/players">Players</a></li>
-        <li><a href="/gallery">Gallery</a></li>
+        <li>
+            <MudButton Href="/">
+                Home
+            </MudButton>
+        </li>
+        <li>
+            <MudButton Href="/portals">
+                Portals
+            </MudButton>
+        </li>
+        <li>
+            <MudButton Href="/players">
+                Players
+            </MudButton>
+        </li>
         <li style="margin-left: auto;">
-            <a href="javascript:void(0)" @onclick="ToggleTheme">
-                <span class="theme-icon">@(IsDarkMode ? "🌙" : "☀️")</span>
-            </a>
+            <MudIconButton Icon="@(IsDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" @onclick="ToggleTheme"/>
         </li>
     </ul>
 </nav>

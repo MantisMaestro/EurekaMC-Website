@@ -1,18 +1,25 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
 
-<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="@_theme"/>
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <CascadingValue Value="_isDarkMode">
-        <NavMenu IsDarkModeChanged="ChangeTheme"/>
-    </CascadingValue>
-
+    @* <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))"/> *@
+    @* <MudThemeManager Open="ThemeManagerOpen" OpenChanged="OpenThemeManager" Theme="_themeManager" *@
+    @*                  ThemeChanged="UpdateTheme" IsDarkMode="_isDarkMode"/> *@
     <MudMainContent Style="padding-top: 48px;">
         <MudContainer MaxWidth="MaxWidth.Large">
+            <CascadingValue Value="_isDarkMode">
+                <div class="mb-4">
+                    <NavMenu IsDarkModeChanged="ChangeTheme"/>
+                </div>
+            </CascadingValue>
+
             @Body
+
         </MudContainer>
     </MudMainContent>
 </MudLayout>
@@ -21,21 +28,53 @@
 
     private readonly MudTheme _theme = new()
     {
-        PaletteLight = new PaletteLight(),
+        PaletteLight = new PaletteLight()
+        {
+            Surface = MudColor.Parse("rgba(252, 231, 200, 1)"),
+            
+        },
         PaletteDark = new PaletteDark()
+        {
+            Surface = MudColor.Parse("rgba(92, 73, 52, 1)"),
+            HoverOpacity = 0.5
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "12px"
+        }
     };
 
-    private bool _isDarkMode;
+    private bool _isDarkMode = true;
 
-    private string? _selectedTheme = LightMode;
-
-    private static string? LightMode => Icons.Material.Filled.LightMode;
-    private static string? DarkMode => Icons.Material.Filled.DarkMode;
+    // private ThemeManagerTheme _themeManager = new ThemeManagerTheme();
+    // public bool ThemeManagerOpen = false;
+    //
+    // protected override Task OnInitializedAsync()
+    // {
+    //     // _themeManager.Theme = _theme;
+    //     return base.OnInitializedAsync();
+    // }
 
     private void ChangeTheme()
     {
         _isDarkMode = !_isDarkMode;
-        _selectedTheme = _isDarkMode ? DarkMode : LightMode;
+        StateHasChanged();
+    }
+
+    // void OpenThemeManager(bool value)
+    // {
+    //     ThemeManagerOpen = value;
+    // }
+    //
+    // void UpdateTheme(ThemeManagerTheme value)
+    // {
+    //     _themeManager = value;
+    //     StateHasChanged();
+    // }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
     }
 
 }
