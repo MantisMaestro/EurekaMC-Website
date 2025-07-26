@@ -1,16 +1,54 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudMainContent>
+    <MudMainContent Style="padding-top: 80px;">
         <MudContainer MaxWidth="MaxWidth.Large">
 
+            <CascadingValue Value="_isDarkMode">
+                <NavMenu IsDarkModeChanged="ChangeTheme"/>
+            </CascadingValue>
+            
             @Body
 
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+@code{
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Background = MudColor.Parse("rgb(246, 254, 250)")
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Background = MudColor.Parse("#36322D"),
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "12px"
+        }
+    };
+
+    private bool _isDarkMode = true;
+
+    private void ChangeTheme()
+    {
+        _isDarkMode = !_isDarkMode;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
+    }
+
+}

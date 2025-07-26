@@ -7,6 +7,8 @@ public interface IDataService
 {
     public Task<List<Player>> GetOnlinePlayers();
 
+    public Task<int> GetTodayPlayerCount();
+
     public Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit);
 
     public Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit);

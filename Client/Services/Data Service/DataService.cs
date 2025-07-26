@@ -16,6 +16,17 @@ public class DataService(EurekaContext eurekaContext) : IDataService
             .ToListAsync();
     }
 
+    public async Task<int> GetTodayPlayerCount()
+    {
+        var date = DateOnly.FromDateTime(DateTime.Today - TimeSpan.FromDays(7));
+
+        return await eurekaContext
+            .PlayerSessions
+            .Where(x => x.Date >= date)
+            .GroupBy(x => x.PlayerId)
+            .CountAsync();
+    }
+
     public async Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit)
     {
         return await GetTopPlayers(limit, DateOnly.FromDateTime(DateTime.Today), null);

@@ -1,0 +1,34 @@
+<nav class="horizontal-nav mb-4">
+    <ul>
+        <li>
+            <MudButton Href="/">
+                Home
+            </MudButton>
+        </li>
+        <li>
+            <MudButton Href="/portals">
+                Portals
+            </MudButton>
+        </li>
+        <li>
+            <MudButton Href="/players">
+                Players
+            </MudButton>
+        </li>
+        <li>
+            <MudIconButton Icon="@(IsDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" @onclick="ToggleTheme"/>
+        </li>
+    </ul>
+</nav>
+
+@code {
+    [CascadingParameter] private bool IsDarkMode { get; set; }
+
+    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+
+    private async Task ToggleTheme()
+    {
+        await IsDarkModeChanged.InvokeAsync(!IsDarkMode);
+    }
+
+}
