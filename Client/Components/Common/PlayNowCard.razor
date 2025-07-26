@@ -1,8 +1,12 @@
+@inject IJSRuntime JsRuntime
+@inject IConfiguration Configuration
+
 <MudPaper Class="pa-4 text-center play-now-card" Style="cursor: pointer; height: 100%;"
-          onclick="window.open('ms-xbl-6af6e7cc://', '_blank')">
+          @onclick="CopyIpAddressToClipboard">
     <div class="d-flex flex-column align-center">
-        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">Play Now - <b>173.240.152.72:9000</b></MudText>
-        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">@OnlineNow
+        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">Play Now - <b>@IpAddress</b></MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">
+            @OnlineNow
             @if (OnlineNow == 1)
             {
                 <span> Player</span>
@@ -18,4 +22,22 @@
 
 @code {
     [Parameter] public int OnlineNow { get; set; }
+
+    private string? IpAddress { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        IpAddress = Configuration["Server:IpAddress"] ?? "173.240.152.72:9000";
+        return base.OnInitializedAsync();
+    }
+
+    private async Task CopyIpAddressToClipboard()
+    {
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", IpAddress);
+        IpAddress = "Copied to Clipboard!";
+        StateHasChanged();
+        await Task.Delay(2000);
+        IpAddress = "173.240.152.72:9000";
+        StateHasChanged();
+    }
 }

@@ -13,26 +13,17 @@
         <PatreonCard/>
     </MudItem>
     <MudItem xs="12">
-        <MudCarousel TData="object" Class="mud-width-full" Style="height: 640px; border-radius: 5px;" ShowArrows="true"
-                     AutoCycle="false" AutoCycleTime="TimeSpan.FromSeconds(5)">
-            <MudCarouselItem Transition="Transition">
-                <MudPaper>
-                    <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
-                              Src="images/img1.png"></MudImage>
-                </MudPaper>
-            </MudCarouselItem>
-            <MudCarouselItem Transition="Transition">
-                <MudPaper>
-                    <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
-                              Src="images/img2.png"></MudImage>
-                </MudPaper>
-            </MudCarouselItem>
-            <MudCarouselItem Transition="Transition">
-                <MudPaper>
-                    <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
-                              Src="images/img3.jpg"></MudImage>
-                </MudPaper>
-            </MudCarouselItem>
+        <MudCarousel TData="object" Class="mud-width-full" Style="height: clamp(200px, 40vw, 640px); border-radius: 5px;" ShowArrows="true"
+                     AutoCycle="true" AutoCycleTime="TimeSpan.FromSeconds(5)">
+            @foreach (var image in _carouselImages)
+            {
+                <MudCarouselItem Transition="Transition">
+                    <MudPaper>
+                        <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
+                                  Src="@image"></MudImage>
+                    </MudPaper>
+                </MudCarouselItem>
+            }
         </MudCarousel>
     </MudItem>
 </MudGrid>
@@ -41,7 +32,7 @@
     private const Transition Transition = MudBlazor.Transition.Fade;
 
     private List<Player> _onlinePlayers = [];
-
+    private List<string> _carouselImages = [];
     private int _onlineToday;
 
     protected override async Task OnInitializedAsync()
@@ -49,6 +40,10 @@
         _onlinePlayers = await DataService.GetOnlinePlayers();
         _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
         _onlineToday = await DataService.GetTodayPlayerCount();
+        _carouselImages = Directory.GetFiles("wwwroot/images/carousel", "*.*")
+            .Where(file => new[] { ".jpg", ".jpeg", ".png", ".gif" }.Contains(Path.GetExtension(file).ToLower()))
+            .Select(file => $"images/carousel/{Path.GetFileName(file)}")
+            .ToList();
     }
 
 }
