@@ -22,12 +22,25 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        
         run: dotnet test --verbosity normal
-      - name: Publish
         
+      - name: Publish
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: dotnet publish Client/Client.csproj -c Release
+        
+      - name: Upload Client publish output
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-publish
+          path: Client/bin/Release/net9.0/publish/
+          
+      - name: Upload Pinger content
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinger-content
+          path: Pinger/
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -38,6 +51,19 @@ jobs:
       # url: https://${{ secrets.VPS_HOST }} # Optional: adds link in UI
     steps:
       - uses: actions/checkout@v4
+        
+      - name: Download Client publish output
+        uses: actions/download-artifact@v4
+        with:
+          name: client-publish
+          path: ClientPublish
+          
+      - name: Download Client publish output
+        uses: actions/download-artifact@v4
+        with:
+          name: pinger-publish
+          path: PingerPublish
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -46,9 +72,9 @@ jobs:
       # Deploy Client
       - name: Deploy Client to VPS
         run: |
-          scp -r Client/bin/Release/net9.0/publish/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/test/Client/
+          scp -r ClientPublish/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/test/Client/
           
       # Deploy Pinger
       - name: Deploy Pinger to VPS
         run: |
-          scp -r Pinger/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/test/Pinger/
+          scp -r PingerPublish/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/test/Pinger/
