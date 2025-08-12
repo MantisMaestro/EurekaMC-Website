@@ -20,6 +20,7 @@
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="8.10.0"/>
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0"/>
+        <PackageReference Include="pythonnet" Version="3.0.5" />
     </ItemGroup>
 
     <ItemGroup>
