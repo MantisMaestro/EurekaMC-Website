@@ -1,6 +1,7 @@
 using Client.Components;
 using Client.Services;
 using Client.Services.Data_Service;
+using CSnakes.Runtime;
 using EurekaDb.Context;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,13 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
+
+var home = Path.Join(Environment.CurrentDirectory, ".");
+builder.Services
+    .WithPython()
+    .WithHome(home)
+    .FromRedistributable();
+
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddHostedService<PingService>();
 
