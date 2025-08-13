@@ -93,6 +93,67 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         };
     }
 
+    public async Task UpdateLedger(string[] playerData)
+    {
+        await eurekaContext
+            .Players
+            .Where(x => x.LastOnline == "now")
+            .ExecuteUpdateAsync(x => x.SetProperty(k => k.LastOnline, DateTime.UtcNow.ToShortDateString()));
+
+        foreach (var player in playerData)
+        {
+            var tokens = player.Split(',');
+            await UpdatePlayers(tokens[0], tokens[1]);
+            await UpdateSessions(tokens[0], tokens[1]);
+        }
+    }
+
+    public async Task UpdatePlayers(string playerName, string playerId)
+    {
+        var player = await eurekaContext.Players
+            .FirstOrDefaultAsync(x => x.Id == playerId);
+
+        if (player is null)
+        {
+            await eurekaContext.AddAsync(new Player
+            {
+                Id = playerId,
+                Name = playerName
+            });
+        }
+        else
+        {
+            player.LastOnline = "now";
+            player.Name = playerName;
+            player.TotalPlayTime += 60;
+        }
+
+        await eurekaContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateSessions(string playerName, string playerId)
+    {
+        var session = eurekaContext
+            .PlayerSessions
+            .FirstOrDefault(x => x.PlayerId == playerId & x.Date == DateOnly.FromDateTime(DateTime.Today));
+
+        if (session is null)
+        {
+            eurekaContext.PlayerSessions.Add(new PlayerSession
+            {
+                PlayerId = playerId,
+                Date = DateOnly.FromDateTime(DateTime.Today),
+                TimePlayedInSession = 60
+            });
+        }
+        else
+        {
+            session.TimePlayedInSession += 60;
+        }
+
+        await eurekaContext.SaveChangesAsync();
+    }
+
     private async Task<List<PlayerPlaytime>> GetTopPlayers(int limit, DateOnly startDate, DateOnly? endDate)
     {
         endDate ??= DateOnly.FromDateTime(DateTime.Today);

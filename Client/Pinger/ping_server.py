@@ -33,7 +33,7 @@ def ping_server(ip, port):
         # If no one is online, status.players.sample will be None. Return an empty list.
         if status.players.sample is None:
             return []
-        return [{'name': player.name, 'id': player.id} for player in status.players.sample]
+        return [(player.name + ',' + player.id) for player in status.players.sample]
     except Exception as e:
         # Catch any exception during ping and log it. Return an empty list so the script doesn't crash.
         logging.error(f"Could not ping server at {ip}:{port}. Reason: {e}")
