@@ -1,17 +1,15 @@
 using Client.Services.Data_Service;
-using Python.Runtime;
+using CSnakes.Runtime;
 
 namespace Client.Services;
 
-public class PingService(ILogger<PingService> logger, IConfiguration configuration, IServiceScopeFactory scopeFactory)
-    : IHostedService
+public class PingService(ILogger<PingService> logger, IServiceScopeFactory serviceScopeFactory)
+    : BackgroundService
 {
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Ping Service Started.");
-        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
-
-        Runtime.PythonDLL = configuration["PythonRuntime"];
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
 
         do
         {
@@ -24,29 +22,18 @@ public class PingService(ILogger<PingService> logger, IConfiguration configurati
                 logger.LogError(ex, "Ping Service Error.");
             }
 
-            await Task.Delay(1000, cancellationToken);
-        } while (await timer.WaitForNextTickAsync(cancellationToken));
+            await Task.Delay(1000, stoppingToken);
+        } while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
     private async Task PingServer()
     {
-        using (Py.GIL())
-        {
-            dynamic module = Py.Import("ping_server");
-            var result = module.ping_server("173.240.152.72", 9000);
-            var response = (string[])result;
+        var scope = serviceScopeFactory.CreateScope();
+        var pythonEnv = scope.ServiceProvider.GetRequiredService<IPythonEnvironment>();
+        var module = pythonEnv.PingServer();
+        var result = module.Main();
 
-            var scope = scopeFactory.CreateScope();
-            var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
-            await dataService.UpdateLedger(response);
-        }
-
-        await Task.CompletedTask;
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Ping Service stopped at: {time}", DateTimeOffset.Now);
-        await Task.CompletedTask;
+        var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
+        await dataService.UpdateLedger(result.ToArray());
     }
 }

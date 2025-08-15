@@ -14,13 +14,14 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
-var home = Path.Join(Environment.CurrentDirectory, ".");
 builder.Services
     .WithPython()
-    .WithHome(home)
-    .FromRedistributable();
+    .WithHome(Environment.CurrentDirectory)
+    .WithVirtualEnvironment(Path.Combine(Environment.CurrentDirectory, ".venv"))
+    .FromEnvironmentVariable("PYTHONHOME", "3.12");
 
 builder.Services.AddScoped<IDataService, DataService>();
+
 builder.Services.AddHostedService<PingService>();
 
 builder.Services.AddDbContext<EurekaContext>(e => e.UseSqlite(
@@ -49,4 +50,5 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 app.Run();

@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>cdce90d5-164c-414c-9ef5-3206588ad9c6</UserSecretsId>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,7 +22,6 @@
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="8.11.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0"/>
-        <PackageReference Include="pythonnet" Version="3.0.5" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,9 +35,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Pinger\**\*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <TargetPath>%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+        <Content Update="config.yaml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <Content Update="config.dev.yaml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <AdditionalFiles Include="*.py">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AdditionalFiles>
     </ItemGroup>
 </Project>

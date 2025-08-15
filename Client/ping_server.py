@@ -35,17 +35,17 @@ def ping_server(ip, port):
         return []
 
 
-def main():
+def main() -> list[str]:
     """Main execution function."""
 
     config = load_config()
     if not config:
-        return
+        return [""]
 
     # Check for required configuration keys before proceeding.
     required_keys = ['server', 'port', 'db_connection_string']
     if not all(key in config for key in required_keys):
-        return
+        return [""]
 
     ping_data = ping_server(config['server'], config['port'])
     return ping_data

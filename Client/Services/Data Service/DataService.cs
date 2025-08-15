@@ -95,10 +95,12 @@ public class DataService(EurekaContext eurekaContext) : IDataService
 
     public async Task UpdateLedger(string[] playerData)
     {
+        var now = DateTime.UtcNow.ToShortDateString();
+        
         await eurekaContext
             .Players
             .Where(x => x.LastOnline == "now")
-            .ExecuteUpdateAsync(x => x.SetProperty(k => k.LastOnline, DateTime.UtcNow.ToShortDateString()));
+            .ExecuteUpdateAsync(x => x.SetProperty(k => k.LastOnline, now));
 
         foreach (var player in playerData)
         {
