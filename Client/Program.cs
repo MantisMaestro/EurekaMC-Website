@@ -18,7 +18,8 @@ builder.Services
     .WithPython()
     .WithHome(Environment.CurrentDirectory)
     .WithVirtualEnvironment(Path.Combine(Environment.CurrentDirectory, ".venv"))
-    .FromEnvironmentVariable("PYTHONHOME", "3.12");
+    .FromEnvironmentVariable("PYTHONHOME", "3.12")
+    .WithPipInstaller();
 
 builder.Services.AddScoped<IDataService, DataService>();
 
