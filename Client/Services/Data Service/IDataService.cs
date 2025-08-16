@@ -20,8 +20,8 @@ public interface IDataService
     public Task<PlayerQuery?> GetPlayerSessions(string playerName);
 
     public Task UpdateLedger(string[] playerData);
-    
+
     public Task UpdatePlayers(string playerName, string playerId);
-    
+
     public Task UpdateSessions(string playerName, string playerId);
 }

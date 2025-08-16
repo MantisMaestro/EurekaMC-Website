@@ -10,17 +10,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSnakes.Runtime" Version="1.2.1" />
+        <PackageReference Include="CSnakes.Runtime" Version="1.2.1"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MudBlazor" Version="8.11.0" />
+        <PackageReference Include="MudBlazor" Version="8.11.0"/>
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0"/>
     </ItemGroup>
 
@@ -35,15 +35,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Update="config.yaml">
+        <None Update="config.yaml">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Update="config.dev.yaml">
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+        <None Update="config.dev.yaml">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Update="requirements.txt">
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+        <None Update="requirements.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
         <AdditionalFiles Include="*.py">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </AdditionalFiles>

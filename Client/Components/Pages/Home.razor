@@ -13,7 +13,8 @@
         <PatreonCard/>
     </MudItem>
     <MudItem xs="12">
-        <MudCarousel TData="object" Class="mud-width-full" Style="height: clamp(200px, 40vw, 640px); border-radius: 5px;" ShowArrows="true"
+        <MudCarousel TData="object" Class="mud-width-full"
+                     Style="height: clamp(200px, 40vw, 640px); border-radius: 5px;" ShowArrows="true"
                      AutoCycle="true" AutoCycleTime="TimeSpan.FromSeconds(5)">
             @foreach (var image in _carouselImages)
             {

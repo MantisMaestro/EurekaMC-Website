@@ -96,7 +96,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     public async Task UpdateLedger(string[] playerData)
     {
         var now = DateTime.UtcNow.ToShortDateString();
-        
+
         await eurekaContext
             .Players
             .Where(x => x.LastOnline == "now")
@@ -137,21 +137,17 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     {
         var session = eurekaContext
             .PlayerSessions
-            .FirstOrDefault(x => x.PlayerId == playerId & x.Date == DateOnly.FromDateTime(DateTime.Today));
+            .FirstOrDefault(x => (x.PlayerId == playerId) & (x.Date == DateOnly.FromDateTime(DateTime.Today)));
 
         if (session is null)
-        {
             eurekaContext.PlayerSessions.Add(new PlayerSession
             {
                 PlayerId = playerId,
                 Date = DateOnly.FromDateTime(DateTime.Today),
                 TimePlayedInSession = 60
             });
-        }
         else
-        {
             session.TimePlayedInSession += 60;
-        }
 
         await eurekaContext.SaveChangesAsync();
     }
