@@ -3,8 +3,8 @@
 @rendermode InteractiveServer
 
 @inject ISnackbar Snackbar
-
 @inject IDataService DataService
+@inject IConfiguration Configuration
 
 <PageTitle>Home</PageTitle>
 
@@ -52,7 +52,7 @@
                             <MudButton OnClick="ViewTodayTopPlayers">Day</MudButton>
                             <MudButton OnClick="ViewWeekTopPlayers">Week</MudButton>
                             <MudButton OnClick="ViewMonthTopPlayers">Month</MudButton>
-                            <MudButton OnClick="ViewMapTopPlayers">Map 11</MudButton>
+                            <MudButton OnClick="ViewMapTopPlayers">Map @_mapIteration</MudButton>
                         </MudButtonGroup>
                     </MudItem>
 
@@ -111,6 +111,8 @@
 
     private string _selectedTime = "This Week";
 
+    private string? _mapIteration = "";
+    
     public string? PlayerName { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -119,6 +121,9 @@
         _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
 
         _topPlayers = await DataService.GetWeekTopPlayers(10);
+
+        var nextMapStartDate = Convert.ToDateTime(Configuration["Server:NextMapStartDate"]);
+        _mapIteration = DateTime.UtcNow > nextMapStartDate ? Configuration["Server:NextMap"] : Configuration["Server:CurrentMap"];
     }
 
     private async Task ViewTodayTopPlayers()
