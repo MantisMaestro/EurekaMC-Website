@@ -68,7 +68,10 @@ jobs:
       # Deploy Client
       - name: Deploy Client to VPS
         run: |
-          scp -r ClientPublish/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/eureka-website/
+          rsync -az --delete \
+            -e "ssh" \
+            ClientPublish/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/eureka-website/
 
       - name: Start service on VPS
         run: |

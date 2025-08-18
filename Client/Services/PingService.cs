@@ -9,7 +9,7 @@ public class PingService(ILogger<PingService> logger, IServiceScopeFactory servi
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Ping Service Started.");
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
 
         do
         {
@@ -21,8 +21,6 @@ public class PingService(ILogger<PingService> logger, IServiceScopeFactory servi
             {
                 logger.LogError(ex, "Ping Service Error.");
             }
-
-            await Task.Delay(1000, stoppingToken);
         } while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
