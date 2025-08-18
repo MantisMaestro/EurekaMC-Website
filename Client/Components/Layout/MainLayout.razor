@@ -13,7 +13,7 @@
             <CascadingValue Value="_isDarkMode">
                 <NavMenu IsDarkModeChanged="ChangeTheme"/>
             </CascadingValue>
-            
+
             @Body
 
         </MudContainer>
@@ -24,13 +24,13 @@
 
     private readonly MudTheme _theme = new()
     {
-        PaletteLight = new PaletteLight()
+        PaletteLight = new PaletteLight
         {
             Background = MudColor.Parse("rgb(246, 254, 250)")
         },
-        PaletteDark = new PaletteDark()
+        PaletteDark = new PaletteDark
         {
-            Background = MudColor.Parse("#36322D"),
+            Background = MudColor.Parse("#36322D")
         },
         LayoutProperties = new LayoutProperties
         {

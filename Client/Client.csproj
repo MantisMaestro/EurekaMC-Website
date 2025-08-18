@@ -6,19 +6,21 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>cdce90d5-164c-414c-9ef5-3206588ad9c6</UserSecretsId>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+        <PackageReference Include="CSnakes.Runtime" Version="1.2.1"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MudBlazor" Version="8.10.0"/>
+        <PackageReference Include="MudBlazor" Version="8.11.0"/>
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0"/>
     </ItemGroup>
 
@@ -32,4 +34,21 @@
         <ProjectReference Include="..\EurekaDb\EurekaDb.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="config.yaml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+        <None Update="config.dev.yaml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+        <None Update="requirements.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+        <AdditionalFiles Include="*.py">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AdditionalFiles>
+    </ItemGroup>
 </Project>
