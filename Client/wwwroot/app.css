@@ -70,7 +70,9 @@ h1:focus {
 
 .responsive-carousel-image {
     width: 100%;
-    height: 100%;
+    height: auto;
+    display: block; /* ensure no inline gap collapses affect height */
     object-fit: cover;
     object-position: center;
 }
+

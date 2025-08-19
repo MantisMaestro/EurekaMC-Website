@@ -1,6 +1,7 @@
 @page "/"
 
 @inject IDataService DataService
+@inject IJSRuntime Js;
 
 <MudGrid Class="d-flex">
     <MudItem Class="flex-fill" lg="3" xs="12">
@@ -13,19 +14,21 @@
         <PatreonCard/>
     </MudItem>
     <MudItem xs="12">
-        <MudCarousel TData="object" Class="mud-width-full"
-                     Style="height: clamp(200px, 40vw, 640px); border-radius: 5px;" ShowArrows="true"
-                     AutoCycle="true" AutoCycleTime="TimeSpan.FromSeconds(5)">
-            @foreach (var image in _carouselImages)
-            {
-                <MudCarouselItem Transition="Transition">
-                    <MudPaper>
-                        <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
-                                  Src="@image"></MudImage>
-                    </MudPaper>
-                </MudCarouselItem>
-            }
-        </MudCarousel>
+        <div @ref="_carouselContainerRef" style="height: 500px; border-radius: 5px; overflow: hidden;">
+            <MudCarousel TData="object" Class="mud-width-full"
+                         Style="height: 100%; border-radius: 5px;" ShowArrows="true"
+                         AutoCycle="true" AutoCycleTime="TimeSpan.FromSeconds(5)">
+                @foreach (var image in _carouselImages)
+                {
+                    <MudCarouselItem Transition="Transition">
+                        <MudPaper>
+                            <MudImage Class="responsive-carousel-image" ObjectFit="ObjectFit.Cover"
+                                      Src="@image"></MudImage>
+                        </MudPaper>
+                    </MudCarouselItem>
+                }
+            </MudCarousel>
+        </div>
     </MudItem>
 </MudGrid>
 
@@ -35,6 +38,9 @@
     private List<Player> _onlinePlayers = [];
     private List<string> _carouselImages = [];
     private int _onlineToday;
+
+    private ElementReference _carouselContainerRef;
+    private IJSObjectReference? _jsModule;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,4 +53,12 @@
             .ToList();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "/Components/Pages/Home.razor.js");
+            await _jsModule.InvokeVoidAsync("initCarouselAutoHeight", _carouselContainerRef, 500);
+        }
+    }
 }
