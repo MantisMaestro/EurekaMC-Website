@@ -4,15 +4,36 @@
 @inject IJSRuntime Js;
 
 <MudGrid Class="d-flex">
+    <MudItem xs="2">
+        <MudImage Src="images/carrot.webp" Style="height: 56px; width: auto; transform: scaleX(-1); float: left;"
+                  Alt="An image of a Carrot."/>
+    </MudItem>
+
+    <MudItem xs="8">
+        <MudText Typo="Typo.h2" Align="Align.Center" Style="color: orange;">
+            EUREKA MINECRAFT
+        </MudText>
+    </MudItem>
+
+    <MudItem xs="2">
+        <MudImage Src="images/carrot.webp" Style="height: 56px; width: auto; float: right;"
+                  Alt="An image of a Carrot."/>
+    </MudItem>
+
+    <MudFlexBreak/>
+
     <MudItem Class="flex-fill" lg="3" xs="12">
         <DiscordCard/>
     </MudItem>
+
     <MudItem Class="flex-fill" lg="6" xs="12">
         <PlayNowCard OnlineNow="_onlineToday"/>
     </MudItem>
+
     <MudItem Class="flex-fill" lg="3" xs="12">
         <PatreonCard/>
     </MudItem>
+
     <MudItem xs="12">
         <div @ref="_carouselContainerRef" style="height: 500px; border-radius: 5px; overflow: hidden;">
             <MudCarousel TData="object" Class="mud-width-full"
@@ -48,7 +69,7 @@
         _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
         _onlineToday = await DataService.GetTodayPlayerCount();
         _carouselImages = Directory.GetFiles("wwwroot/images/carousel", "*.*")
-            .Where(file => new[] { ".jpg", ".jpeg", ".png", ".gif" }.Contains(Path.GetExtension(file).ToLower()))
+            .Where(file => new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(Path.GetExtension(file).ToLower()))
             .Select(file => $"images/carousel/{Path.GetFileName(file)}")
             .ToList();
     }
@@ -61,4 +82,5 @@
             await _jsModule.InvokeVoidAsync("initCarouselAutoHeight", _carouselContainerRef, 500);
         }
     }
+
 }
