@@ -15,7 +15,7 @@ public interface IDataService
 
     public Task<List<PlayerPlaytime>> GetMonthTopPlayers(int limit);
 
-    public Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit);
+    public Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate);
 
     public Task<PlayerQuery?> GetPlayerSessions(string playerName);
 
