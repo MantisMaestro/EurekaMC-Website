@@ -112,6 +112,8 @@
     private string _selectedTime = "This Week";
 
     private string? _mapIteration = "";
+
+    private DateOnly _currentMapStartDate;
     
     public string? PlayerName { get; set; }
 
@@ -123,6 +125,7 @@
         _topPlayers = await DataService.GetWeekTopPlayers(10);
 
         var nextMapStartDate = Convert.ToDateTime(Configuration["Server:NextMapStartDate"]);
+        _currentMapStartDate = DateOnly.FromDateTime(Convert.ToDateTime(Configuration["Server:CurrentMapStartDate"]));
         _mapIteration = DateTime.UtcNow > nextMapStartDate ? Configuration["Server:NextMap"] : Configuration["Server:CurrentMap"];
     }
 
@@ -152,7 +155,7 @@
 
     private async Task ViewMapTopPlayers()
     {
-        _topPlayers = await DataService.GetMapTopPlayers(10);
+        _topPlayers = await DataService.GetMapTopPlayers(10, _currentMapStartDate);
         _selectedTime = "On This Map";
     }
 

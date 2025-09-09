@@ -47,11 +47,11 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         return await GetTopPlayers(limit, monthStartDate, null);
     }
 
-    public async Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit)
+    public async Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate)
     {
         // TODO: Have this based on a config file or the database!
         var mapStart = new DateOnly(2024, 07, 26);
-        return await GetTopPlayers(limit, mapStart, null);
+        return await GetTopPlayers(limit, currentMapStartDate, null);
     }
 
     public async Task<PlayerQuery?> GetPlayerSessions(string playerName)
