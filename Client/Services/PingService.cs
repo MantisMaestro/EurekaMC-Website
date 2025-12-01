@@ -1,9 +1,12 @@
 using Client.Services.Data_Service;
-using CSnakes.Runtime;
+using MCStatus;
 
 namespace Client.Services;
 
-public class PingService(ILogger<PingService> logger, IServiceScopeFactory serviceScopeFactory)
+public class PingService(
+    ILogger<PingService> logger,
+    IConfiguration configuration,
+    IServiceScopeFactory serviceScopeFactory)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,12 +29,15 @@ public class PingService(ILogger<PingService> logger, IServiceScopeFactory servi
 
     private async Task PingServer()
     {
-        var scope = serviceScopeFactory.CreateScope();
-        var pythonEnv = scope.ServiceProvider.GetRequiredService<IPythonEnvironment>();
-        var module = pythonEnv.PingServer();
-        var result = module.Main();
+        using var scope = serviceScopeFactory.CreateScope();
+
+        var address = configuration["Server:IP"];
+        var port = configuration["Server:Port"];
+        if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(port)) return;
+        
+        var status = await ServerListClient.GetStatusAsync(address, Convert.ToUInt16(port));
 
         var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
-        await dataService.UpdateLedger(result.ToArray());
+        await dataService.UpdateLedger(status.Players.Sample);
     }
 }

@@ -1,3 +1,0 @@
-server: 173.240.152.72
-port: 9000
-db_connection_string: "/srv/db/eureka.db"

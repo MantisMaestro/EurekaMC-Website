@@ -93,7 +93,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         };
     }
 
-    public async Task UpdateLedger(string[] playerData)
+    public async Task UpdateLedger(MCStatus.Player[] playerData)
     {
         var now = DateTime.UtcNow.ToShortDateString();
 
@@ -104,9 +104,8 @@ public class DataService(EurekaContext eurekaContext) : IDataService
 
         foreach (var player in playerData)
         {
-            var tokens = player.Split(',');
-            await UpdatePlayers(tokens[0], tokens[1]);
-            await UpdateSessions(tokens[0], tokens[1]);
+            await UpdatePlayers(player.Name, player.Uuid.ToString());
+            await UpdateSessions(player.Name, player.Uuid.ToString());
         }
     }
 

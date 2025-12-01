@@ -1,8 +1,6 @@
 using Client.Components;
 using Client.Services;
 using Client.Services.Data_Service;
-using CSnakes.Runtime;
-using CSnakes.Runtime.Locators;
 using EurekaDb.Context;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -14,13 +12,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
-
-builder.Services
-    .WithPython()
-    .WithHome(Environment.CurrentDirectory)
-    .WithVirtualEnvironment(Path.Combine(Environment.CurrentDirectory, ".venv"))
-    .FromRedistributable(RedistributablePythonVersion.Python3_12)
-    .WithPipInstaller();
 
 builder.Services.AddScoped<IDataService, DataService>();
 
