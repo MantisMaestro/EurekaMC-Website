@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.x
+          dotnet-version: 10.x
 
       - name: Restore dependencies
         run: dotnet restore
@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: client-publish
-          path: Client/bin/Release/net9.0/publish/
+          path: Client/bin/Release/net10.0/publish/
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
