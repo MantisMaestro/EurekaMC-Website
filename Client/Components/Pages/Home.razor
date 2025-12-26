@@ -3,7 +3,7 @@
 @inject IDataService DataService
 @inject IJSRuntime Js;
 
-<MudGrid Class="d-flex">
+<MudGrid class="d-flex">
     <MudItem xs="2">
         <MudImage Src="images/carrot.webp" Style="height: 56px; width: auto; transform: scaleX(-1); float: left;"
                   Alt="An image of a Carrot."/>
@@ -50,6 +50,11 @@
                 }
             </MudCarousel>
         </div>
+    </MudItem>
+
+    <MudItem xs="12">
+        @* ReSharper disable once Html.PathError *@
+        <iframe class="map-iframe" src="/map/?world=minecraft_overworld" width="100%" height="500px"></iframe>
     </MudItem>
 </MudGrid>
 

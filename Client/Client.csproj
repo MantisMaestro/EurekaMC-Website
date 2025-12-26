@@ -23,6 +23,7 @@
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="8.14.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0"/>
+        <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -33,11 +34,5 @@
 
     <ItemGroup>
         <ProjectReference Include="..\EurekaDb\EurekaDb.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="*.py">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </AdditionalFiles>
     </ItemGroup>
 </Project>
