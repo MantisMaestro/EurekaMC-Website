@@ -20,6 +20,8 @@ builder.Services.AddHostedService<PingService>();
 builder.Services.AddDbContext<EurekaContext>(e => e.UseSqlite(
     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
