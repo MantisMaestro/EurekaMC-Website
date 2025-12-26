@@ -46,4 +46,6 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+app.MapReverseProxy();
+
 app.Run();
