@@ -1,10 +1,16 @@
+@using Client.Models
+@inject IReadOnlyList<MapInfo> Maps
+
 <div class="d-flex align-center" style="gap: 16px;">
     <MudButton Href="/" Color="Color.Inherit">
         Home
     </MudButton>
-    <MudButton Href="http://173.240.152.72:25575/?world=world" Color="Color.Inherit">
-        Map
-    </MudButton>
+    @if (_hasActiveMap)
+    {
+        <MudButton Href="http://173.240.152.72:25575/?world=world" Color="Color.Inherit">
+            Map
+        </MudButton>
+    }
     <MudButton Href="/portals" Color="Color.Inherit">
         Portals
     </MudButton>
@@ -23,6 +29,14 @@
     [CascadingParameter] private bool IsDarkMode { get; set; }
 
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+
+    private bool _hasActiveMap;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTimeOffset.UtcNow;
+        _hasActiveMap = Maps.Any(map => now >= map.StartDateUtc && now < map.EndDateUtc);
+    }
 
     private async Task ToggleTheme()
     {

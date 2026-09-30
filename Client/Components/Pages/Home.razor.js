@@ -1,4 +1,16 @@
 // wwwroot/js/carouselHeight.js
+export function formatDateTimeLocal(utcDateString) {
+    const date = new Date(utcDateString);
+    return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short"
+    }).format(date);
+}
+
 export function initCarouselAutoHeight(container, maxHeight = 500) {
     if (!container) return;
 

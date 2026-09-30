@@ -1,6 +1,8 @@
 @page "/"
+@using Client.Models
 
 @inject IDataService DataService
+@inject IReadOnlyList<MapInfo> Maps
 @inject IJSRuntime Js;
 
 <MudGrid class="d-flex">
@@ -21,6 +23,17 @@
     </MudItem>
 
     <MudFlexBreak/>
+
+    @if (_upcomingMap is not null)
+    {
+        <MudItem xs="12" Class="d-flex justify-center">
+            <MudPaper Class="pa-2 text-center" Style="width: 100%;">
+                <MudText Align="Align.Center" Color="Color.Tertiary" Typo="Typo.subtitle1">
+                    <b>New map launches @_launchDateText</b>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    }
 
     <MudItem Class="flex-fill" lg="3" xs="12">
         <DiscordCard/>
@@ -53,26 +66,58 @@
     </MudItem>
 
     <MudItem xs="12">
-        @* ReSharper disable once Html.PathError *@
-        <iframe class="map-iframe" src="/map/?world=minecraft_overworld" width="100%" height="500px"></iframe>
+
+        @if (_upcomingMap is not null || _launchMap is not null)
+        {
+            <MudPaper Class="pa-8 d-flex flex-column align-center justify-center text-center"
+                      Style="min-height: 220px;">
+                <MudText Typo="Typo.h5">The live map is coming soon</MudText>
+                <MudText Typo="Typo.body1" Class="mt-2">
+                    The map will be revealed when the new map launches on @_mapDateText.
+                </MudText>
+            </MudPaper>
+        }
+        else
+        {
+            @* ReSharper disable once Html.PathError *@
+            <iframe class="map-iframe" src="/map/?world=minecraft_overworld" width="100%" height="500px"></iframe>
+        }
     </MudItem>
 </MudGrid>
 
 @code {
     private const Transition Transition = MudBlazor.Transition.Fade;
 
-    private List<Player> _onlinePlayers = [];
     private List<string> _carouselImages = [];
     private int _onlineToday;
+    private MapInfo? _launchMap;
+    private MapInfo? _upcomingMap;
+    private string _launchDateText = string.Empty;
+    private string _mapDateText = string.Empty;
 
     private ElementReference _carouselContainerRef;
     private IJSObjectReference? _jsModule;
 
     protected override async Task OnInitializedAsync()
     {
-        _onlinePlayers = await DataService.GetOnlinePlayers();
-        _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
         _onlineToday = await DataService.GetTodayPlayerCount();
+        var now = DateTimeOffset.UtcNow;
+        _launchMap = Maps
+            .Where(map => now >= map.StartDateUtc && now < map.EndDateUtc)
+            .OrderByDescending(map => map.StartDateUtc)
+            .FirstOrDefault();
+        _upcomingMap = Maps.Where(map => map.StartDateUtc > now)
+            .OrderBy(map => map.StartDateUtc)
+            .FirstOrDefault();
+
+        var mapToReveal = _upcomingMap ?? _launchMap;
+        if (mapToReveal is not null)
+        {
+            _mapDateText = mapToReveal.StartDateUtc.ToString(
+                "MMMM d, yyyy 'at' h:mm tt 'UTC'", System.Globalization.CultureInfo.InvariantCulture);
+            _launchDateText = _upcomingMap is null ? string.Empty : _mapDateText;
+        }
+
         _carouselImages = Directory.GetFiles("wwwroot/images/carousel", "*.*")
             .Where(file => new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(Path.GetExtension(file).ToLower()))
             .Select(file => $"images/carousel/{Path.GetFileName(file)}")
@@ -85,6 +130,18 @@
         {
             _jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "/Components/Pages/Home.razor.js");
             await _jsModule.InvokeVoidAsync("initCarouselAutoHeight", _carouselContainerRef, 500);
+            var mapToReveal = _upcomingMap ?? _launchMap;
+            if (mapToReveal is not null)
+            {
+                _mapDateText = await _jsModule.InvokeAsync<string>(
+                    "formatDateTimeLocal",
+                    mapToReveal.StartDateUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture));
+                if (_upcomingMap is not null)
+                {
+                    _launchDateText = _mapDateText;
+                }
+                StateHasChanged();
+            }
         }
     }
 

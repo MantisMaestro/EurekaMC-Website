@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 
 @inject IDataService DataService
-@inject IConfiguration Configuration
+@inject IReadOnlyList<MapInfo> Maps
 
 <PageTitle>Home</PageTitle>
 
@@ -90,9 +90,17 @@
 
         _topPlayers = await DataService.GetWeekTopPlayers(10);
 
-        var nextMapStartDate = Convert.ToDateTime(Configuration["Server:NextMapStartDate"]);
-        _currentMapStartDate = DateOnly.FromDateTime(Convert.ToDateTime(Configuration["Server:CurrentMapStartDate"]));
-        _mapIteration = DateTime.UtcNow > nextMapStartDate ? Configuration["Server:NextMap"] : Configuration["Server:CurrentMap"];
+        var now = DateTimeOffset.UtcNow;
+        var currentMap = Maps
+            .Where(map => now >= map.StartDateUtc && now < map.EndDateUtc)
+            .OrderByDescending(map => map.StartDateUtc)
+            .FirstOrDefault();
+
+        if (currentMap is not null)
+        {
+            _currentMapStartDate = DateOnly.FromDateTime(currentMap.StartDateUtc.UtcDateTime);
+            _mapIteration = currentMap.Name;
+        }
     }
 
     private async Task ViewTodayTopPlayers()

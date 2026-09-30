@@ -1,11 +1,13 @@
+using Client.Models;
 using Client.Services.Data_Service;
 using MCStatus;
+using Microsoft.Extensions.Options;
 
 namespace Client.Services;
 
 public class PingService(
     ILogger<PingService> logger,
-    IConfiguration configuration,
+    IOptions<ServerSettings> serverSettings,
     IServiceScopeFactory serviceScopeFactory)
     : BackgroundService
 {
@@ -31,11 +33,10 @@ public class PingService(
     {
         using var scope = serviceScopeFactory.CreateScope();
 
-        var address = configuration["Server:IP"];
-        var port = configuration["Server:Port"];
-        if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(port)) return;
-        
-        var status = await ServerListClient.GetStatusAsync(address, Convert.ToUInt16(port));
+        var settings = serverSettings.Value;
+        if (string.IsNullOrEmpty(settings.IP) || !ushort.TryParse(settings.Port, out var port)) return;
+
+        var status = await ServerListClient.GetStatusAsync(settings.IP, port);
 
         var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
         await dataService.UpdateLedger(status.Players.Sample, 60);
