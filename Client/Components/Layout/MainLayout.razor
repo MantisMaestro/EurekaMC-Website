@@ -53,15 +53,9 @@
 
     private bool _isDarkMode = true;
 
-    private void ChangeTheme()
+    private void ChangeTheme(bool isDarkMode)
     {
-        _isDarkMode = !_isDarkMode;
-        StateHasChanged();
-    }
-
-    protected override void OnInitialized()
-    {
-        StateHasChanged();
+        _isDarkMode = isDarkMode;
     }
 
 }

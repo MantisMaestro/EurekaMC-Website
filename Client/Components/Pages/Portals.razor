@@ -61,8 +61,8 @@
 
     private void ConvertToOverworld()
     {
-        OverworldX = Math.Floor(NetherX / 8);
-        OverworldZ = Math.Floor(NetherZ / 8);
+        OverworldX = NetherX * 8;
+        OverworldZ = NetherZ * 8;
     }
 
 }

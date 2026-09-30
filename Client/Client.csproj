@@ -22,14 +22,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="9.11.0" />
-        <PackageReference Include="MudBlazor.ThemeManager" Version="4.0.0" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <_ContentIncludedByDefault Remove="wwwroot\bulma\bulma.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\bulma\bulma.css.map"/>
-        <_ContentIncludedByDefault Remove="wwwroot\bulma\bulma.min.css"/>
     </ItemGroup>
 
     <ItemGroup>
