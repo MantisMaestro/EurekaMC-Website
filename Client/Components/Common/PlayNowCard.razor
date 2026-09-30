@@ -1,10 +1,12 @@
 @inject IJSRuntime JsRuntime
-@inject IConfiguration Configuration
+@using Client.Models
+@using Microsoft.Extensions.Options
+@inject IOptions<ServerSettings> ServerSettings
 
 <MudPaper Class="pa-4 text-center" Style="cursor: pointer; height: 100%;"
           @onclick="CopyIpAddressToClipboard">
     <div class="d-flex flex-column align-center">
-        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">Play Now - <b>@IpAddress</b></MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">Play Now - <b>@(_copied ? "Copied to Clipboard!" : IpAddress)</b></MudText>
         <MudText Align="Align.Center" Typo="Typo.h6" Class="mb-2">
             @OnlineNow
             @if (OnlineNow == 1)
@@ -17,27 +19,24 @@
             }
             Online Recently
         </MudText>
+        <MudText Align="Align.Center" Typo="Typo.body2">Version @ServerSettings.Value.Version</MudText>
     </div>
 </MudPaper>
 
 @code {
     [Parameter] public int OnlineNow { get; set; }
 
-    private string? IpAddress { get; set; }
+    private string IpAddress => ServerSettings.Value.Address;
+    private bool _copied;
 
-    protected override Task OnInitializedAsync()
-    {
-        IpAddress = Configuration["Server:IpAddress"] ?? "173.240.152.72:9000";
-        return base.OnInitializedAsync();
-    }
 
     private async Task CopyIpAddressToClipboard()
     {
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", IpAddress);
-        IpAddress = "Copied to Clipboard!";
+        _copied = true;
         StateHasChanged();
         await Task.Delay(2000);
-        IpAddress = "173.240.152.72:9000";
+        _copied = false;
         StateHasChanged();
     }
 

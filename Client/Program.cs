@@ -1,4 +1,5 @@
 using Client.Components;
+using Client.Models;
 using Client.Services;
 using Client.Services.Data_Service;
 using EurekaDb.Context;
@@ -12,6 +13,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
+builder.Services.Configure<ServerSettings>(builder.Configuration.GetSection("Server"));
+builder.Services.AddSingleton<IReadOnlyList<MapInfo>>(
+    builder.Configuration.GetSection("Maps").Get<List<MapInfo>>() ?? []);
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddHostedService<PingService>();
 builder.Services.AddDbContext<EurekaContext>(e => e.UseSqlite(

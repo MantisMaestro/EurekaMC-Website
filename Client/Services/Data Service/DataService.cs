@@ -13,49 +13,52 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         var threshold = DateTime.UtcNow.AddSeconds(-90);
         return await eurekaContext
             .Players
+            .AsNoTracking()
             .Where(x => x.LastOnline >= threshold)
             .ToListAsync();
     }
 
-    public async Task<int> GetTodayPlayerCount()
+    public async Task<int> GetRecentPlayerCount()
     {
-        var date = DateOnly.FromDateTime(DateTime.Today - TimeSpan.FromDays(7));
+        var date = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
 
         return await eurekaContext
             .PlayerSessions
             .Where(x => x.Date >= date)
-            .GroupBy(x => x.PlayerId)
+            .Select(x => x.PlayerId)
+            .Distinct()
             .CountAsync();
     }
 
-    public async Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit)
+    public Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit)
     {
-        return await GetTopPlayers(limit, DateOnly.FromDateTime(DateTime.Today), null);
+        return GetTopPlayers(limit, DateOnly.FromDateTime(DateTime.Today));
     }
 
-    public async Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit = 10)
+    public Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit)
     {
         var weekStart = DateOnly.FromDateTime(DateTime.Today).StartOfWeek(DayOfWeek.Monday);
 
-        return await GetTopPlayers(limit, weekStart, null);
+        return GetTopPlayers(limit, weekStart);
     }
 
-    public async Task<List<PlayerPlaytime>> GetMonthTopPlayers(int limit)
+    public Task<List<PlayerPlaytime>> GetMonthTopPlayers(int limit)
     {
-        var monthStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-        var monthStartDate = DateOnly.FromDateTime(monthStart);
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
 
-        return await GetTopPlayers(limit, monthStartDate, null);
+        return GetTopPlayers(limit, monthStart);
     }
 
-    public async Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate)
+    public Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate)
     {
-        return await GetTopPlayers(limit, currentMapStartDate, null);
+        return GetTopPlayers(limit, currentMapStartDate);
     }
 
     public async Task<PlayerQuery?> GetPlayerSessions(string playerName)
     {
         var player = await eurekaContext.Players
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == playerName);
 
         if (player is null) return null;
@@ -66,13 +69,14 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         var startDateOnly = DateOnly.FromDateTime(startDate);
 
         var sessions = await eurekaContext.PlayerSessions
+            .AsNoTracking()
             .Where(x => x.PlayerId == playerId && x.Date >= startDateOnly)
             .Include(x => x.Player)
             .ToListAsync();
 
         var totalPlaytime = sessions.Sum(x => x.TimePlayedInSession ?? 0);
 
-        var dates = sessions.Select(x => x.Date).ToList();
+        var dates = sessions.Select(x => x.Date).ToHashSet();
 
         var today = DateOnly.FromDateTime(DateTime.Today);
         for (var date = startDateOnly; date < today; date = date.AddDays(1))
@@ -96,14 +100,15 @@ public class DataService(EurekaContext eurekaContext) : IDataService
     {
         foreach (var player in playerData)
         {
-            await UpdatePlayers(player.Name, player.Uuid.ToString(), elapsedSeconds);
-            await UpdateSessions(player.Name, player.Uuid.ToString(), elapsedSeconds);
+            var playerId = player.Uuid.ToString();
+            await UpdatePlayers(player.Name, playerId, elapsedSeconds);
+            await UpdateSessions(playerId, elapsedSeconds);
         }
 
         await eurekaContext.SaveChangesAsync();
     }
 
-    public async Task UpdatePlayers(string playerName, string playerId, int elapsedSeconds)
+    private async Task UpdatePlayers(string playerName, string playerId, int elapsedSeconds)
     {
         var player = await eurekaContext.Players
             .FirstOrDefaultAsync(x => x.Id == playerId);
@@ -126,7 +131,7 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         }
     }
 
-    public async Task UpdateSessions(string playerName, string playerId, int elapsedSeconds)
+    private async Task UpdateSessions(string playerId, int elapsedSeconds)
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
         var session = await eurekaContext
@@ -148,9 +153,9 @@ public class DataService(EurekaContext eurekaContext) : IDataService
         }
     }
 
-    private async Task<List<PlayerPlaytime>> GetTopPlayers(int limit, DateOnly startDate, DateOnly? endDate)
+    private async Task<List<PlayerPlaytime>> GetTopPlayers(int limit, DateOnly startDate)
     {
-        endDate ??= DateOnly.FromDateTime(DateTime.Today);
+        var endDate = DateOnly.FromDateTime(DateTime.Today);
 
         return await eurekaContext.PlayerSessions
             .Where(x => x.Date >= startDate && x.Date <= endDate)

@@ -5,23 +5,19 @@ namespace Client.Services.Data_Service;
 
 public interface IDataService
 {
-    public Task<List<Player>> GetOnlinePlayers();
+    Task<List<Player>> GetOnlinePlayers();
 
-    public Task<int> GetTodayPlayerCount();
+    Task<int> GetRecentPlayerCount();
 
-    public Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit);
+    Task<List<PlayerPlaytime>> GetDayTopPlayers(int limit);
 
-    public Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit);
+    Task<List<PlayerPlaytime>> GetWeekTopPlayers(int limit);
 
-    public Task<List<PlayerPlaytime>> GetMonthTopPlayers(int limit);
+    Task<List<PlayerPlaytime>> GetMonthTopPlayers(int limit);
 
-    public Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate);
+    Task<List<PlayerPlaytime>> GetMapTopPlayers(int limit, DateOnly currentMapStartDate);
 
-    public Task<PlayerQuery?> GetPlayerSessions(string playerName);
+    Task<PlayerQuery?> GetPlayerSessions(string playerName);
 
-    public Task UpdateLedger(MCStatus.Player[] playerData, int elapsedSeconds);
-
-    public Task UpdatePlayers(string playerName, string playerId, int elapsedSeconds);
-
-    public Task UpdateSessions(string playerName, string playerId, int elapsedSeconds);
+    Task UpdateLedger(MCStatus.Player[] playerData, int elapsedSeconds);
 }

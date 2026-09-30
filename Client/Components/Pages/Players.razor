@@ -3,9 +3,9 @@
 @rendermode InteractiveServer
 
 @inject IDataService DataService
-@inject IConfiguration Configuration
+@inject IReadOnlyList<MapInfo> Maps
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Players</PageTitle>
 
 <MudPaper Class="px-16 my-4" Elevation="6">
     <MudGrid>
@@ -51,7 +51,7 @@
                             <MudButton OnClick="ViewTodayTopPlayers">Day</MudButton>
                             <MudButton OnClick="ViewWeekTopPlayers">Week</MudButton>
                             <MudButton OnClick="ViewMonthTopPlayers">Month</MudButton>
-                            <MudButton OnClick="ViewMapTopPlayers">Map @_mapIteration</MudButton>
+                            <MudButton OnClick="ViewMapTopPlayers" Disabled="@(_currentMapStartDate is null)">Map @_mapIteration</MudButton>
                         </MudButtonGroup>
                     </MudItem>
 
@@ -60,7 +60,7 @@
                     @foreach (var player in _topPlayers)
                     {
                         <MudItem xs="12" Class="pt-3">
-                            <PlayerCard PlayerName="@player.PlayerName" PlayTimeSeconds="@player.Playtime.ToString()"/>
+                            <PlayerCard PlayerName="@player.PlayerName" PlayTimeSeconds="@player.Playtime"/>
                         </MudItem>
                     }
                 </MudGrid>
@@ -75,24 +75,29 @@
 
     private List<PlayerPlaytime> _topPlayers = [];
 
-    // private List<ChartSeries> _series = [];
-
     private string _selectedTime = "This Week";
 
     private string? _mapIteration = "";
 
-    private DateOnly _currentMapStartDate;
+    private DateOnly? _currentMapStartDate;
 
     protected override async Task OnInitializedAsync()
     {
-        _onlinePlayers = await DataService.GetOnlinePlayers();
-        _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
+        await RefreshOnline();
 
         _topPlayers = await DataService.GetWeekTopPlayers(10);
 
-        var nextMapStartDate = Convert.ToDateTime(Configuration["Server:NextMapStartDate"]);
-        _currentMapStartDate = DateOnly.FromDateTime(Convert.ToDateTime(Configuration["Server:CurrentMapStartDate"]));
-        _mapIteration = DateTime.UtcNow > nextMapStartDate ? Configuration["Server:NextMap"] : Configuration["Server:CurrentMap"];
+        var now = DateTimeOffset.UtcNow;
+        var currentMap = Maps
+            .Where(map => now >= map.StartDateUtc && now < map.EndDateUtc)
+            .OrderByDescending(map => map.StartDateUtc)
+            .FirstOrDefault();
+
+        if (currentMap is not null)
+        {
+            _currentMapStartDate = DateOnly.FromDateTime(currentMap.StartDateUtc.UtcDateTime);
+            _mapIteration = currentMap.Name;
+        }
     }
 
     private async Task ViewTodayTopPlayers()
@@ -121,7 +126,9 @@
 
     private async Task ViewMapTopPlayers()
     {
-        _topPlayers = await DataService.GetMapTopPlayers(10, _currentMapStartDate);
+        if (_currentMapStartDate is not { } startDate) return;
+
+        _topPlayers = await DataService.GetMapTopPlayers(10, startDate);
         _selectedTime = "On This Map";
     }
 }

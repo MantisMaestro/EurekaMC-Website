@@ -1,11 +1,14 @@
 @page "/"
+@using Client.Models
 
 @inject IDataService DataService
-@inject IJSRuntime Js;
+@inject IReadOnlyList<MapInfo> Maps
+@inject IJSRuntime Js
+@inject IWebHostEnvironment Environment
 
 <MudGrid class="d-flex">
     <MudItem xs="2">
-        <MudImage Src="images/carrot.webp" Style="height: 56px; width: auto; transform: scaleX(-1); float: left;"
+        <MudImage Src="images/Carrot.webp" Style="height: 56px; width: auto; transform: scaleX(-1); float: left;"
                   Alt="An image of a Carrot."/>
     </MudItem>
 
@@ -16,18 +19,29 @@
     </MudItem>
 
     <MudItem xs="2">
-        <MudImage Src="images/carrot.webp" Style="height: 56px; width: auto; float: right;"
+        <MudImage Src="images/Carrot.webp" Style="height: 56px; width: auto; float: right;"
                   Alt="An image of a Carrot."/>
     </MudItem>
 
     <MudFlexBreak/>
+
+    @if (_upcomingMap is not null)
+    {
+        <MudItem xs="12" Class="d-flex justify-center">
+            <MudPaper Class="pa-2 text-center" Style="width: 100%;">
+                <MudText Align="Align.Center" Color="Color.Tertiary" Typo="Typo.subtitle1">
+                    <b>New map launches @_launchDateText</b>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    }
 
     <MudItem Class="flex-fill" lg="3" xs="12">
         <DiscordCard/>
     </MudItem>
 
     <MudItem Class="flex-fill" lg="6" xs="12">
-        <PlayNowCard OnlineNow="_onlineToday"/>
+        <PlayNowCard OnlineNow="_recentPlayerCount"/>
     </MudItem>
 
     <MudItem Class="flex-fill" lg="3" xs="12">
@@ -53,28 +67,68 @@
     </MudItem>
 
     <MudItem xs="12">
-        @* ReSharper disable once Html.PathError *@
-        <iframe class="map-iframe" src="/map/?world=minecraft_overworld" width="100%" height="500px"></iframe>
+
+        @if (_activeMap is not null)
+        {
+            @* ReSharper disable once Html.PathError *@
+            <iframe class="map-iframe" src="/map/?world=minecraft_overworld" width="100%" height="500px"></iframe>
+        }
+        else
+        {
+            <MudPaper Class="pa-8 d-flex flex-column align-center justify-center text-center"
+                      Style="min-height: 220px;">
+                <MudText Typo="Typo.h5">The live map will be back with the next map</MudText>
+                <MudText Typo="Typo.body1" Class="mt-2">
+                    @if (_upcomingMap is not null)
+                    {
+                        <span>Map @_upcomingMap.Name launches on @_launchDateText.</span>
+                    }
+                    else
+                    {
+                        <span>Check back for details about the next map launch.</span>
+                    }
+                </MudText>
+            </MudPaper>
+        }
     </MudItem>
 </MudGrid>
 
 @code {
     private const Transition Transition = MudBlazor.Transition.Fade;
+    private static readonly HashSet<string> CarouselImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg", ".jpeg", ".png", ".gif", ".webp"
+    };
 
-    private List<Player> _onlinePlayers = [];
     private List<string> _carouselImages = [];
-    private int _onlineToday;
+    private int _recentPlayerCount;
+    private MapInfo? _activeMap;
+    private MapInfo? _upcomingMap;
+    private string _launchDateText = string.Empty;
 
     private ElementReference _carouselContainerRef;
     private IJSObjectReference? _jsModule;
 
     protected override async Task OnInitializedAsync()
     {
-        _onlinePlayers = await DataService.GetOnlinePlayers();
-        _onlinePlayers = _onlinePlayers.OrderByDescending(x => x.Name).ToList();
-        _onlineToday = await DataService.GetTodayPlayerCount();
-        _carouselImages = Directory.GetFiles("wwwroot/images/carousel", "*.*")
-            .Where(file => new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(Path.GetExtension(file).ToLower()))
+        _recentPlayerCount = await DataService.GetRecentPlayerCount();
+        var now = DateTimeOffset.UtcNow;
+        _activeMap = Maps
+            .Where(map => now >= map.StartDateUtc && now < map.EndDateUtc)
+            .OrderByDescending(map => map.StartDateUtc)
+            .FirstOrDefault();
+        _upcomingMap = Maps.Where(map => map.StartDateUtc > now)
+            .OrderBy(map => map.StartDateUtc)
+            .FirstOrDefault();
+
+        if (_upcomingMap is not null)
+        {
+            _launchDateText = _upcomingMap.StartDateUtc.UtcDateTime.ToString(
+                "MMMM d, yyyy 'at' h:mm tt 'UTC'", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        _carouselImages = Directory.EnumerateFiles(Path.Combine(Environment.WebRootPath, "images", "carousel"))
+            .Where(file => CarouselImageExtensions.Contains(Path.GetExtension(file)))
             .Select(file => $"images/carousel/{Path.GetFileName(file)}")
             .ToList();
     }
@@ -85,6 +139,13 @@
         {
             _jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "/Components/Pages/Home.razor.js");
             await _jsModule.InvokeVoidAsync("initCarouselAutoHeight", _carouselContainerRef, 500);
+            if (_upcomingMap is not null)
+            {
+                _launchDateText = await _jsModule.InvokeAsync<string>(
+                    "formatDateTimeLocal",
+                    _upcomingMap.StartDateUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture));
+                StateHasChanged();
+            }
         }
     }
 

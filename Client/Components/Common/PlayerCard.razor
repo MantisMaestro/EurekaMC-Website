@@ -18,13 +18,13 @@
 @code {
     [Parameter] public string? PlayerName { get; set; }
 
-    [Parameter] public string? PlayTimeSeconds { get; set; }
+    [Parameter] public int? PlayTimeSeconds { get; set; }
 
     private string PlayerAvatarUrl => $"https://cravatar.eu/helmavatar/{PlayerName}/64.png";
 
     private string FormattedPlayTime()
     {
-        var timeSpan = TimeSpan.FromSeconds(int.Parse(PlayTimeSeconds ?? string.Empty));
+        var timeSpan = TimeSpan.FromSeconds(PlayTimeSeconds ?? 0);
         var result = string.Empty;
 
         if (timeSpan.Days > 0)

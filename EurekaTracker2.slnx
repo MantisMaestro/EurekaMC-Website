@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Workflows/">
+    <File Path=".github/workflows/build-publish.yml" />
+  </Folder>
+  <Project Path="Client/Client.csproj" />
+  <Project Path="EurekaDb/EurekaDb.csproj" />
+</Solution>
