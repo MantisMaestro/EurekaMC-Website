@@ -25,7 +25,7 @@
 
     <MudFlexBreak/>
 
-    @if (_upcomingMap is not null)
+    @if (_upcomingMap is not null && _upcomingMap.StartDateUtc < DateTimeOffset.UtcNow.AddDays(14))
     {
         <MudItem xs="12" Class="d-flex justify-center">
             <MudPaper Class="pa-2 text-center" Style="width: 100%;">
